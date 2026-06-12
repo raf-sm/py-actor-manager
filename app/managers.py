@@ -10,32 +10,47 @@ class ActorManager:
         self.connection = sqlite3.connect(db_name)
         self.cursor = self.connection.cursor()
 
-    
     def create(self, first_name: str, last_name: str) -> None:
-        self.cursor.execute(f"INSERT INTO {self.table_name} (first_name, last_name) VALUES (?, ?)", 
-                            (first_name, last_name))
+        self.cursor.execute(
+            (
+                f"INSERT INTO {self.table_name} "
+                "(first_name, last_name) VALUES (?, ?)"
+            ),
+            (first_name, last_name),
+        )
         self.connection.commit()
-
 
     def all(self) -> list[Actor]:
         self.cursor.execute(f"SELECT * FROM {self.table_name}")
         rows = self.cursor.fetchall()
-    
-        actors = []
-        for row in rows:
-            actor = Actor(row[0], row[1], row[2])
-            actors.append(actor)
-            
-        return actors
 
+        return [
+            Actor(row[0], row[1], row[2])
+            for row in rows
+        ]
 
-    def update(self, pk: str, new_first_name: str, new_last_name: str) -> None:
-        self.cursor.execute(f"UPDATE {self.table_name} SET first_name = ?, last_name = ? WHERE id = ?", (new_first_name, new_last_name, pk))
-
+    def update(
+        self,
+        pk: str,
+        new_first_name: str,
+        new_last_name: str,
+    ) -> None:
+        self.cursor.execute(
+            (
+                f"UPDATE {self.table_name} "
+                "SET first_name = ?, last_name = ? "
+                "WHERE id = ?"
+            ),
+            (new_first_name, new_last_name, pk),
+        )
         self.connection.commit()
 
-
     def delete(self, pk: str) -> None:
-        self.cursor.execute(f"DELETE FROM {self.table_name} WHERE id = ?", (pk,))
+        self.cursor.execute(
+            f"DELETE FROM {self.table_name} WHERE id = ?",
+            (pk,),
+        )
+        self.connection.commit()
 
-        self.connection.commit
+    def close(self) -> None:
+        self.connection.close()
