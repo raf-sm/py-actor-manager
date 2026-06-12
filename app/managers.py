@@ -51,6 +51,3 @@ class ActorManager:
             (pk,),
         )
         self.connection.commit()
-
-    def close(self) -> None:
-        self.connection.close()
